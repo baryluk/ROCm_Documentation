@@ -117,7 +117,7 @@ Supported Operating Systems
 Ubuntu
 =========
 
-**Note**: AMD ROCm only supports Long Term Support (LTS) versions of Ubuntu. Versions other than LTS may work with ROCm, however, they are not officially supported. 
+**Note**: AMD ROCm only supports Long Term Support (LTS) versions of Ubuntu. Versions other than LTS may work with ROCm, however, they are not officially supported.
 
 Installing a ROCm Package from a Debian Repository
 '''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -132,20 +132,13 @@ To install from a Debian Repository:
 
     sudo apt dist-upgrade
 
-    sudo apt install libnuma-dev
+    sudo reboot
 
-    sudo reboot 
+You might skeep the reboot in many cases, but it is best to perform it before continuing.
 
 2. Add the ROCm apt repository.
 
 For Debian-based systems like Ubuntu, configure the Debian ROCm repository as follows:
- 
-**Note**: The public key has changed to reflect the new location. You must update to the new location as the old key will be removed in a future release.
-
-* Old Key: https://repo.radeon.com/rocm/apt/debian/rocm.gpg.key
-
-* New Key: https://repo.radeon.com/rocm/rocm.gpg.key 
-
 
 ::
 
@@ -154,9 +147,9 @@ For Debian-based systems like Ubuntu, configure the Debian ROCm repository as fo
     echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/debian/ xenial main' | sudo tee /etc/apt/sources.list.d/rocm.list
 
 
-The gpg key may change; ensure it is updated when installing a new release. If the key signature verification fails while updating, re-add the key from the ROCm apt repository.
+The GPG key may change; ensure it is updated when installing a new release. If the key signature verification fails while updating, re-add the key from the ROCm apt repository.
 
-The current rocm.gpg.key is not available in a standard key ring distribution, but has the following sha1sum hash:
+The current rocm.gpg.key has the following sha1sum hash:
 
 ::
 
@@ -180,7 +173,7 @@ The current rocm.gpg.key is not available in a standard key ring distribution, b
 
 5. To add your user to the video and render groups, use the following command with the sudo password:
 
-**Note**: *render group* is required only for Ubuntu v20.04. For all other ROCm supported operating systems, continue to use *video group*.
+**Note**: Group `render` is required only for Ubuntu v20.04. For all other ROCm supported operating systems, continue to use `video` group.
 
 ::
 
@@ -213,15 +206,29 @@ Note: To run the ROCm programs, add the ROCm binaries in your PATH.
 
     echo 'export PATH=$PATH:/opt/rocm/bin:/opt/rocm/rocprofiler/bin:/opt/rocm/opencl/bin' | sudo tee -a /etc/profile.d/rocm.sh
 
+**Note**: If you installed versioned packages (see below), change `/opt/rocm` to a relevant path with version, like `/opt/rocm-3.9.0`
 
-Uninstalling ROCm Packages from Ubuntu
-''''''''''''''''''''''''''''''''''''''''
 
-To uninstall the ROCm packages from Ubuntu 20.04 or Ubuntu 18.04.5, run the following command:
+Uninstalling ROCm Packages
+'''''''''''''''''''''''''''''
+
+To uninstall the ROCm packages from Ubuntu, run the following command:
 
 ::
 
-  sudo apt autoremove rocm-opencl rocm-dkms rocm-dev rocm-utils && sudo reboot
+  sudo apt autoremove --purge -V rocm-opencl* rocm-dkms* rocm-dev* rocm-utils* && sudo reboot
+
+**Note**: Before confirming removal, verify manually the list of removed packages is sensible, and doesn't remove other important applications. The `autoremove` might remove some non-ROCm libraries, as long as they are not used by other installed packages. If you want to preserved them, use `apt remove` instead, or use package pinning, or force them to be manually installed and preserved using `apt install`.
+
+
+Updating ROCm Packages
+''''''''''''''''''''''''
+
+Due to technical issues, currently updating ROCm packages using `apt` (i.e. `apt upgrade` when new stable ROCm is relased) is not supported. Doing so will most likely result in a non-functional installation.
+
+Instead, perform Uninstall step above first (including a reboot), and then follow by installing new packages from the start.
+
+In the future versions of ROCm this limitation might be fixed.
 
 
 Installing Development Packages for Cross Compilation
